@@ -1,2 +1,2 @@
 # Restaurant Finder
-*~in progress~*
+*in progress*
