@@ -29,7 +29,8 @@ def safe_request(url: str, headers: dict = constants.REQUEST_HEADERS,
     """"""
     time.sleep(anti_dos_delay)
     try:
-        return requests.get(url, headers=headers)
+        data = requests.get(url, headers=headers)
+        return data
     except requests.exceptions.ConnectionError as e:
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
@@ -60,18 +61,19 @@ def generate_image_from_data(image_bytes, text: str = ""):
     return restaurant_slide
 
 
-def google_search_html(search_phrase: str):
+def google_search_html(search_phrase: str, anti_dos_delay: float = constants.ANTI_DOS_DELAY):
     """"""
     search_phrase = search_phrase.replace(" ", "+")
     url = constants.GOOGLE_SEARCH_URL_FORM.format(search_phrase=search_phrase)
-    return bsoup(safe_request(url).content, "html.parser")
+    return bsoup(safe_request(url, anti_dos_delay=anti_dos_delay).content, "html.parser")
 
 
-def get_google_rating(search_phrase: str, pbar: bool = True) -> float:
+def get_google_rating(search_phrase: str, pbar: bool = True,
+                      anti_dos_delay: float = constants.ANTI_DOS_DELAY) -> float:
     """"""
     if isinstance(search_phrase, str):
         try:
-            soup = google_search_html(search_phrase)
+            soup = google_search_html(search_phrase, anti_dos_delay=anti_dos_delay)
             rating = float(soup.find_all("span", {"aria-hidden": "true"})[0].text)
             return rating
 
@@ -82,7 +84,13 @@ def get_google_rating(search_phrase: str, pbar: bool = True) -> float:
             iterator = tqdm(search_phrase, unit=" Restaurant", desc="Fetching Google Reviews")
         else:
             iterator = search_phrase
-        return [get_google_rating(item) for item in iterator]
+
+        # return_array = []
+        # for item in iterator:
+        #     return_array.append(get_google_rating(item, anti_dos_delay=anti_dos_delay))
+
+        # return return_array
+        return [get_google_rating(item, anti_dos_delay=anti_dos_delay) for item in iterator]
 
 
 ########################################################################################################################
