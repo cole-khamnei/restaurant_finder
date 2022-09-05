@@ -2,6 +2,7 @@ import io
 import time
 import requests
 
+import googlemaps
 import matplotlib.pyplot as plt
 
 from bs4 import BeautifulSoup as bsoup
@@ -13,11 +14,13 @@ try:
 except NameError:
     from tqdm import tqdm
 
-import constants
+import constants, private_constants
 
 ########################################################################################################################
 ### Constants ###
 ########################################################################################################################
+
+GOOGLE_CLIENT = googlemaps.Client(private_constants.GOOGLE_API_KEY)
 
 ########################################################################################################################
 ### utilities ###
@@ -61,6 +64,11 @@ def generate_image_from_data(image_bytes, text: str = ""):
     return restaurant_slide
 
 
+########################################################################################################################
+### google tools ###
+########################################################################################################################
+
+
 def google_search_html(search_phrase: str, anti_dos_delay: float = constants.ANTI_DOS_DELAY):
     """"""
     search_phrase = search_phrase.replace(" ", "+")
@@ -85,12 +93,16 @@ def get_google_rating(search_phrase: str, pbar: bool = True,
         else:
             iterator = search_phrase
 
-        # return_array = []
-        # for item in iterator:
-        #     return_array.append(get_google_rating(item, anti_dos_delay=anti_dos_delay))
 
-        # return return_array
         return [get_google_rating(item, anti_dos_delay=anti_dos_delay) for item in iterator]
+
+
+def get_google_place_info(alias: str, fields: list = constants.GOOGLE_PLACE_FIELDS) -> dict:
+    """"""
+    response = GOOGLE_CLIENT.find_place(alias, "textquery", fields=fields)
+    if len(response["candidates"]) != 1:
+        return constants.GOOGLE_PLACE_EMPTY
+    return response["candidates"][0]
 
 
 ########################################################################################################################

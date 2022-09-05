@@ -9,8 +9,6 @@ REQUEST_HEADERS = {
     ' Chrome/39.0.2171.95 Safari/537.36'
 }
 ANTI_DOS_DELAY = 0.1
-GOOGLE_SEARCH_URL_FORM = "https://www.google.com/search?q={search_phrase}"
-
 
 MICHELIN_GUIDE_URL_FORM = "https://guide.michelin.com/us/en/{state}/{city}/restaurants"
 
@@ -40,6 +38,16 @@ SEARCH_LIMIT = 3
 YELP_REQUEST_HEADER = {
     'Authorization': f'Bearer {private_constants.YELP_API_KEY}',
 }
+
+########################################################################################################################
+### Google constants ###
+########################################################################################################################
+
+GOOGLE_SEARCH_URL_FORM = "https://www.google.com/search?q={search_phrase}"
+GOOGLE_PLACE_FIELDS = ["name", "business_status", "place_id", "price_level",
+                       "rating", "user_ratings_total"]
+
+GOOGLE_PLACE_EMPTY = {field: None for field in GOOGLE_PLACE_FIELDS}
 
 ########################################################################################################################
 ### End ###

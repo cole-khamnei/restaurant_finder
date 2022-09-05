@@ -9,7 +9,7 @@ try:
 except NameError:
     from tqdm import tqdm
 
-import constants
+import constants, scrape
 
 ########################################################################################################################
 ### Constants ###
@@ -106,6 +106,21 @@ def yelp_data_to_restaurant_df(data: dict) -> pd.DataFrame:
         restaurant_list.append(row)
 
     return pd.DataFrame(restaurant_list, columns=columns + ["categories", "address", "city"])
+
+
+def add_google_place_info(data: pd.DataFrame) -> pd.DataFrame:
+    """"""
+    fields = ["rating", "user_ratings_total", "price_level", "business_status"]
+    google_data = []
+    iterator = tqdm(data.iterrows(), total=len(data), desc="Fetching Google info", unit=" request")
+    for i, restaurant in iterator:
+        google_data_i = scrape.get_google_place_info(restaurant["alias"])
+        google_data.append([google_data_i.get(field, None) for field in fields])
+
+    
+    df = pd.DataFrame(google_data, columns=["google_rating", "google_ratings_total", "google_price", "status"])
+    return pd.concat([data, df], axis=1)
+
 
 ########################################################################################################################
 ### End ###
